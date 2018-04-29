@@ -21,13 +21,14 @@ class AST_WR(AST_CORE):
 
         for asset in self.assets:
             assert type(asset) is str
+        self.simple_assets = self.assets
     def feed(self):
         self.data = pd.DataFrame()
         self.weights = {}
         self.weight = pd.DataFrame(columns = self.assets)
         self.ind = pd.DataFrame()
         for asset in self.assets:
-            self.data[asset],self.ind[asset] = stro(asset,mode=self.trade_on,indicator = 'WR'+str(int(period)))
+            self.data[asset],self.ind[asset] = stro(asset,mode=self.trade_on,indicator = 'WR'+str(int(self.period)))
         if self.extent:
             self.ind = self.ind.fillna(0)
         else:
@@ -36,9 +37,9 @@ class AST_WR(AST_CORE):
 
     def __call__(self):
         res,sass,cass,rw = self.pre_call()
+        q = 1-self.ind
         for i in range(self.period,len(self.data)):
-
-            rw.iloc[i] = self.p*gmv + (1-self.p)*mve
+            rw.iloc[i] = q.iloc[i]/q.iloc[i].sum()
             res.iloc[i] = np.dot(rw.iloc[i-1],self.data.iloc[i])
         return self.post_call(res,sass,cass,rw)
 

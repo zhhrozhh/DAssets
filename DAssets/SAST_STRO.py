@@ -9,12 +9,22 @@ except:
 
 def WR(data,period):
     rhmax = data.Adj_High.rolling(window = period,center = False).max()
-    rmmin = data.Adj_Low.rolling(window = period,center = False).max()
+    rmmin = data.Adj_Low.rolling(window = period,center = False).min()
     return (rhmax-data.Adj_Close)/(rhmax-rmmin)
+
+def MACD(data,period_f,period_s,period_si):
+    DIF = data.Adj_Close.ewm(alpha = 1.0/float(period_f),min_periods = period_f).mean() - data.Adj_Close.ewm(alpha = 1.0/float(period_s),min_periods = period_s).mean()
+    DEM = DIF.ewm(alpha = 1.0/float(period_si),min_periods = period_si).mean()
+    OSC = DIF - DEM
+    return OSC
+
 def pitcher(ind,data):
     if ind[:2] == 'WR':
         period = int(ind[2:])
         return WR(data,period)
+    elif ind[:4] == 'MACD':
+        periods = list(map(int,ind[4:].split(',')))
+        return MACD(data,periods[0],periods[1],periods[2])
 class SAST_STRO:
     def __init__(self):
         self.stro = pd.DataFrame()
