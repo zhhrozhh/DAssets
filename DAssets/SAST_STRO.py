@@ -13,8 +13,9 @@ def WR(data,period):
     return (rhmax-data.Adj_Close)/(rhmax-rmmin)
 
 def MACD(data,period_f,period_s,period_si):
-    DIF = data.Adj_Close.ewm(alpha = 1.0/float(period_f),min_periods = period_f).mean() - data.Adj_Close.ewm(alpha = 1.0/float(period_s),min_periods = period_s).mean()
-    DEM = DIF.ewm(alpha = 1.0/float(period_si),min_periods = period_si).mean()
+
+    DIF = data.Adj_Close.ewm(span = period_f,adjust=True,ignore_na=False).mean() - data.Adj_Close.ewm(span = period_s,adjust = True,ignore_na=False).mean()
+    DEM = DIF.ewm(span = period_si,adjust = True,ignore_na = False).mean()
     OSC = DIF - DEM
     return OSC
 
@@ -24,7 +25,7 @@ def pitcher(ind,data):
         return WR(data,period)
     elif ind[:4] == 'MACD':
         periods = list(map(int,ind[4:].split(',')))
-        return MACD(data,periods[0],periods[1],periods[2])
+        return MACD(data,*periods)
 class SAST_STRO:
     def __init__(self):
         self.stro = pd.DataFrame()
