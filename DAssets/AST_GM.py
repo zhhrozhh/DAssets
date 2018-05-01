@@ -16,7 +16,7 @@ class AST_GM(AST_CORE):
         no_short = True,
         optimizer_tol = 1e-15,
         optimizer_maxiter = 600,
-        extent = False,
+        extend = False,
         trade_on = 'close',
         p = 0.2,
         decay = 0,
@@ -30,7 +30,7 @@ class AST_GM(AST_CORE):
         
         self.assets = sub_assets
         self.trade_on = trade_on
-        self.extent = extent
+        self.extend = extend
         self.p = p
         self.decay = decay
         self.decay_dir = decay_dir
@@ -50,11 +50,18 @@ class AST_GM(AST_CORE):
         self.weight = pd.DataFrame(columns = self.simple_assets)
         for asset in self.assets:
             if type(asset) is str:
-                self.data[asset] = stro(asset,mode=self.trade_on)
+                
+                a = stro(asset,mode=self.trade_on)
+                if len(a) > len(self.data):
+                    self.data = self.data.reindex(a.index,fill_value = np.nan)
+                self.data[asset] = a
             else:
                 asset.feed()
-                self.data[asset.name],self.weights[asset.name] = asset()
-        if self.extent:
+                a,self.weights[asset.name] = asset()
+                if len(a) > len(self.data):
+                    self.data = self.data.reindex(a.index,fill_value = np.nan)
+                self.data[asset.name] = a
+        if self.extend:
             self.data = self.data.fillna(0)
         else:
             self.data = self.data.dropna()

@@ -14,7 +14,7 @@ class AST_CC(AST_CORE):
         decay_dir = 'pos',
         p = 0.2,
         mode = 'close',
-        extent = False
+        extend = False
     ):
         AST_CORE.__init__(self,name)
         self.assets = sub_assets
@@ -25,7 +25,7 @@ class AST_CC(AST_CORE):
         self.decay_dir = decay_dir
         assert decay_dir in ['pos','neg']
         self.trade_on = mode
-        self.extent = extent
+        self.extend = extend
         self.no_short = no_short
         self.p = p
 
@@ -41,11 +41,17 @@ class AST_CC(AST_CORE):
         self.weight = pd.DataFrame(columns = self.simple_assets)
         for asset in self.assets:
             if type(asset) is str:
-                self.data[asset] = stro(asset,mode=self.trade_on)
+                a = stro(asset,mode=self.trade_on)
+                if len(a) > len(self.data):
+                    self.data = self.data.reindex(a.index,fill_value = np.nan)
+                self.data[asset] = a    
             else:
                 asset.feed()
-                self.data[asset.name],self.weights[asset.name] = asset()
-        if self.extent:
+                a,self.weights[asset.name] = asset()
+                if len(a) > len(self.data):
+                    self.data = self.data.reindex(a.index,fill_value = np.nan)
+                self.data[asset.name] = a
+        if self.extend:
             self.data = self.data.fillna(0)
         else:
             self.data = self.data.dropna()

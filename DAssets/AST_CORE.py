@@ -44,6 +44,7 @@ class AST_CORE:
         for asset in cass:
             w = pd.DataFrame(columns = self.simple_assets)
             v = self.weights[asset]
+            v = v.reindex(w.index,fill_value = 1/float(len(v.columns)))
             w[v.columns] = v[v.columns]
             w = w.loc[W.index]
             w = w.fillna(0)
