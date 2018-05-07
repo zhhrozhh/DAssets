@@ -79,17 +79,24 @@ class AST_CC(AST_CORE):
             while len(d.columns) > 1:
                 corr = None
                 if self.method == 'max':
-                    corr = -d.corr()+2*np.identity(len(d.columns))
+                    corr = (-d.corr().fillna(1)+2*np.identity(len(d.columns)))
                 else:
-                    corr = d.corr()
+                    corr = d.corr().fillna(1)+np.identity(len(d.columns))
 
                 ass1 = corr.min().idxmin()
                 ass2 = corr[ass1].idxmin()
 
-                rho = d.corr()[ass1][ass2]
-
-                d1 = d.pop(ass1)
-                d2 = d.pop(ass2)
+                rho = d.corr().fillna(1)[ass1][ass2]
+                www = d.columns
+                try:
+                    d1 = d.pop(ass1)
+                    d2 = d.pop(ass2)
+                except:
+                    print(www)
+                    print(ass1)
+                    print(ass2)
+                    print(corr)
+                    return None,None
 
                 s1 = d1.std(ddof = 0)
                 s2 = d2.std(ddof = 0)

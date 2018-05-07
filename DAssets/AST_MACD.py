@@ -13,14 +13,14 @@ class AST_MACD(AST_CORE):
         period_Slow = 26,
         period_Sig = 9,
         mode = 'close',
-        extent = False
+        extend = False
     ):
         AST_CORE.__init__(self,name)
         self.assets = sub_assets
         self.period = period_Fast + period_Slow + period_Sig
         self.periods = [period_Fast,period_Slow,period_Sig]
         self.trade_on = mode
-        self.extent = extent
+        self.extend = extend
         self.no_short = no_short
         
         for asset in self.assets:
@@ -36,7 +36,7 @@ class AST_MACD(AST_CORE):
             if len(a)>len(self.data):
                 self.data = self.data.reindex(a.index,fill_value = np.nan)
             self.data[asset],self.ind[asset] = a,i
-        if self.extent:
+        if self.extend:
             self.ind = self.ind.fillna(0)
         else:
             self.ind = self.ind.dropna()

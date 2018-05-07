@@ -46,7 +46,7 @@ class AST_CORE:
             v = self.weights[asset]
             v = v.reindex(w.index,fill_value = 1/float(len(v.columns)))
             w[v.columns] = v[v.columns]
-            w = w.loc[W.index]
+            # w = w.loc[W.index]
             w = w.fillna(0)
             z = pd.DataFrame({col:rw[asset] for col in self.simple_assets})
             W = W + w*z

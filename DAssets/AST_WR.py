@@ -28,10 +28,10 @@ class AST_WR(AST_CORE):
         self.weight = pd.DataFrame(columns = self.assets)
         self.ind = pd.DataFrame()
         for asset in self.assets:
-        	a,i = stro(asset,mode=self.trade_on,indicator = 'WR'+str(int(self.period)))
-        	if len(a) > len(self.data):
-        		self.data = self.data.reindex(a.index,fill_value = np.nan)
-        		self.ind = self.ind.reindex(i.index,fill_value = np.nan)
+            a,i = stro(asset,mode=self.trade_on,indicator = 'WR'+str(int(self.period)))
+            if len(a) > len(self.data):
+                self.data = self.data.reindex(a.index,fill_value = np.nan)
+                self.ind = self.ind.reindex(i.index,fill_value = np.nan)
             self.data[asset],self.ind[asset] = a,i
         if self.extend:
             self.ind = self.ind.fillna(0)
